@@ -300,6 +300,18 @@ def get_inbound_citations_count(s2orc_metadata_dir: str, output_path: str, worke
 
     logger.info(f'Saved to {output_path}')
 
+def worker_extract_matching_titles(batch_fn):
+    batch = []
+
+    with open(os.path.join(s2orc_metadata_dir, batch_fn)) as batch_f:
+        for i, line in enumerate(batch_f):
+            meta = json.loads(line)
+
+            if meta['title'] in unique_scidocs_titles:
+                batch.append((
+                    meta['paper_id'], meta['title']
+                ))
+    return batch
 
 def get_scidocs_title_mapping(scidocs_dir, s2orc_metadata_dir, output_fp, workers: int = 10):
     """
@@ -336,19 +348,6 @@ def get_scidocs_title_mapping(scidocs_dir, s2orc_metadata_dir, output_fp, worker
     batch_fns = [batch_fn for batch_fn in os.listdir(s2orc_metadata_dir) if batch_fn.endswith('.jsonl.gz')]
 
     logger.info(f'Files available: {len(batch_fns):,}')
-
-    def worker_extract_matching_titles(batch_fn):
-        batch = []
-
-        with open(os.path.join(s2orc_metadata_dir, batch_fn)) as batch_f:
-            for i, line in enumerate(batch_f):
-                meta = json.loads(line)
-
-                if meta['title'] in unique_scidocs_titles:
-                    batch.append((
-                        meta['paper_id'], meta['title']
-                    ))
-        return batch
 
     # Run threads
     with Pool(workers) as pool:
