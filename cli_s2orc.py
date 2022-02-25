@@ -300,7 +300,7 @@ def get_inbound_citations_count(s2orc_metadata_dir: str, output_path: str, worke
 
     logger.info(f'Saved to {output_path}')
 
-def worker_extract_matching_titles(batch_fn):
+def worker_extract_matching_titles(s2orc_metadata_dir, batch_fn):
     batch = []
 
     with open(os.path.join(s2orc_metadata_dir, batch_fn)) as batch_f:
@@ -351,7 +351,7 @@ def get_scidocs_title_mapping(scidocs_dir, s2orc_metadata_dir, output_fp, worker
 
     # Run threads
     with Pool(workers) as pool:
-        pool_outputs = list(tqdm(pool.imap_unordered(worker_extract_matching_titles, batch_fns), total=len(batch_fns)))
+        pool_outputs = list(tqdm(pool.imap_unordered(worker_extract_matching_titles, s2orc_metadata_dir, batch_fns), total=len(batch_fns)))
 
     # Merge thread outputs
     matching_titles = [i for o in pool_outputs for i in o]
