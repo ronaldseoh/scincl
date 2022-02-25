@@ -303,7 +303,7 @@ def get_inbound_citations_count(s2orc_metadata_dir: str, output_path: str, worke
 def worker_extract_matching_titles(batch_fn):
     batch = []
 
-    with open(os.path.join(s2orc_metadata_dir, batch_fn)) as batch_f:
+    with open(os.path.join(s2orc_metadata_dir_global_var, batch_fn)) as batch_f:
         for i, line in enumerate(batch_f):
             meta = json.loads(line)
 
@@ -340,6 +340,7 @@ def get_scidocs_title_mapping(scidocs_dir, s2orc_metadata_dir, output_fp, worker
 
     logger.info(f'scidocs_titles = {len(scidocs_titles):,}')
 
+    global unique_scidocs_titles
     unique_scidocs_titles = set(scidocs_titles)
 
     logger.info(f'unique_scidocs_titles = {len(unique_scidocs_titles):,}')
@@ -350,6 +351,9 @@ def get_scidocs_title_mapping(scidocs_dir, s2orc_metadata_dir, output_fp, worker
     logger.info(f'Files available: {len(batch_fns):,}')
 
     # Run threads
+    global s2orc_metadata_dir_global_var
+    s2orc_metadata_dir_global_var = s2orc_metadata_dir
+
     with Pool(workers) as pool:
         pool_outputs = list(tqdm(pool.imap_unordered(worker_extract_matching_titles, batch_fns), total=len(batch_fns)))
 
