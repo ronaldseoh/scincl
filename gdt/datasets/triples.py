@@ -224,7 +224,7 @@ class TripleDataset(Dataset):
                 padding='max_length',
                 max_length=self.max_sequence_length,
                 truncation=True,
-                return_token_type_ids=False
+                return_special_tokens_mask=True,
             )
 
             # Store in index
