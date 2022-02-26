@@ -28,7 +28,9 @@ class TripleDataset(Dataset):
                  max_sequence_length: int = 512,
                  mlm_probability: float = 0.15,
                  graph_embeddings_path: str = None,
-                 graph_paper_ids_path: str = None):
+                 graph_paper_ids_path: str = None,
+                 return_token_type_ids: bool = False,
+                 return_special_tokens_mask: bool = False):
         """
         Initialize dataset with settings (does not load data)
 
@@ -50,6 +52,8 @@ class TripleDataset(Dataset):
         self.mlm_probability = mlm_probability
         self.graph_embeddings_path = graph_embeddings_path
         self.graph_paper_ids_path = graph_paper_ids_path
+        self.return_token_type_ids = return_token_type_ids
+        self.return_special_tokens_mask = return_special_tokens_mask
 
         self.paper_id_to_metadata = {}
         # self.positive_inputs = None
@@ -224,7 +228,8 @@ class TripleDataset(Dataset):
                 padding='max_length',
                 max_length=self.max_sequence_length,
                 truncation=True,
-                return_special_tokens_mask=True,
+                return_token_type_ids=self.return_token_type_ids,
+                return_special_tokens_mask=self.return_special_tokens_mask,
             )
 
             # Store in index
