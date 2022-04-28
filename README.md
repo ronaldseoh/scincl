@@ -84,6 +84,8 @@ Download
 - [S2ORC 20200705v1](https://github.com/allenai/s2orc)
 - SPECTER's original training data: [train.pickle](https://ai2-s2-research-public.s3-us-west-2.amazonaws.com/specter/training-data/train.pkl) (see [here](https://github.com/allenai/specter/issues/2))
 - [SciDocs evaluation benchmark](https://github.com/allenai/scidocs)
+- Replicated SPECTER w/o leakage: [Pretrained weights and paper ID triples](https://huggingface.co/malteos/specter-wol)
+
 
 Set the following environment variables accordingly:
 ```bash
@@ -192,6 +194,13 @@ python cli_triples.py get_specter_like_triples \
 
 ### Citation graph embeddings
 
+#### Download citation embeddings
+
+- Replicated SPECTER (w/ leakage): [Pretrained embeddings (H5; 150 GB)](https://static.openlegaldata.io/scincl/s2orc_with_specter_without_scidocs/embeddings_paper_id_0.v200.h5), [paper IDs (JSON)](https://static.openlegaldata.io/scincl/s2orc_with_specter_without_scidocs/entity_names_paper_id_0.json)
+- Random S2ORC (w/o leakage): [Pretrained embeddings (H5; 150 GB)](https://static.openlegaldata.io/scincl/s2orc_without_scidocs/embeddings_paper_id_0.v200.h5), [paper IDs (JSON)](https://static.openlegaldata.io/scincl/s2orc_without_scidocs/entity_names_paper_id_0.json)
+
+#### Train citation embedding model
+
 Select config file:
 ```bash
 # or other config files
@@ -294,6 +303,19 @@ The exact scripts to reproduce our experiments are in the `/sbin` directory.
 Evaluation results are reported to [Weights & Biases](https://wandb.com) or stored on disk.
 
 The individual pipeline steps can be run separately or reused to save compute time by setting corresponding arguments (e.g., `--skip-triples`).
+
+## How to cite
+
+If you are using our code or data, please cite [our paper](https://arxiv.org/abs/2202.06671):
+
+```bibtex
+@article{Ostendorff2022scincl,
+  title={Neighborhood Contrastive Learning for Scientific Document Representations with Citation Embeddings},
+  author={Ostendorff, Malte and Rethmeier, Nils and Augenstein, Isabelle and Gipp, Bela and Rehm, Georg},
+  journal={arXiv preprint arXiv:2202.06671},
+  year={2022}
+}
+```
 
 ## License
 
