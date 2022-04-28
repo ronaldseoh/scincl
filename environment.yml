@@ -169,7 +169,7 @@ dependencies:
     - rsa==4.7.2
     - s3transfer==0.5.2
     - sacremoses==0.0.47
-    - git+https://github.com/allenai/scidocs@master
+    - git+https://github.com/malteos/scidocs@master
     - scikit-learn==0.24.2
     - scipy==1.5.4
     - seaborn==0.11.2
