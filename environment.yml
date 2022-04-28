@@ -126,7 +126,7 @@ dependencies:
     - jmespath==0.10.0
     - joblib==1.1.0
     - jsonlines==3.0.0
-    - jsonnet==0.18.0
+    - jsonnet-binary==0.17.0
     - jsonpickle==2.1.0
     - jupyter==1.0.0
     - jupyter-console==6.4.0
