@@ -369,7 +369,11 @@ def build_faiss(
 
     for i in tqdm(range(0, len(graph_embeddings), batch_size), desc=f'Adding (batch_size={batch_size:,})'):
         vecs = graph_embeddings[i: i + batch_size]
-        index.add(vecs)
+
+        try:
+            index.add(vecs)
+        except:
+            continue
 
         # See https://github.com/facebookresearch/faiss/issues/1517
         # index.reclaimMemory()
