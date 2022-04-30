@@ -372,7 +372,7 @@ def build_faiss(
         index.add(vecs)
 
         # See https://github.com/facebookresearch/faiss/issues/1517
-        # index.reclaimMemory()
+        index.reclaimMemory()
 
     faiss.write_index(index, index_path)
 
