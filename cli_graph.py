@@ -361,18 +361,18 @@ def build_faiss(
 
     index.train(train_vecs)
 
-    # write to disk
-    if (isinstance(device, int) and device > -1) or device == 'all':
-        logger.info('Index back to CPU')
-
-        index = faiss.index_gpu_to_cpu(index)
-
     for i in tqdm(range(0, len(graph_embeddings), batch_size), desc=f'Adding (batch_size={batch_size:,})'):
         vecs = graph_embeddings[i: i + batch_size]
         index.add(vecs)
 
         # See https://github.com/facebookresearch/faiss/issues/1517
-        # index.reclaimMemory()
+        index.reclaimMemory()
+
+    # write to disk
+    if (isinstance(device, int) and device > -1) or device == 'all':
+        logger.info('Index back to CPU')
+
+        index = faiss.index_gpu_to_cpu(index)
 
     faiss.write_index(index, index_path)
 
