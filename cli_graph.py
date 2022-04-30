@@ -373,7 +373,12 @@ def build_faiss(
         try:
             index.add(vecs)
         except:
-            continue
+            for j in enumerate(vecs):
+                try:
+                    index.add(vecs[j])
+                except:
+                    print(str(i+j), "was the culprit.")
+                    continue
 
         # See https://github.com/facebookresearch/faiss/issues/1517
         # index.reclaimMemory()
