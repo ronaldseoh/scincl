@@ -2,7 +2,6 @@ import json
 import logging
 import os
 from typing import Dict
-import gc
 
 import torch
 from smart_open import open
@@ -112,6 +111,28 @@ class TripleDataset(Dataset):
         :param paper_id:
         :return:
         """
+
+        if paper_id not in self.paper_id_to_inputs.keys() or 'input_ids' not in self.paper_id_to_inputs[paper_id].keys():
+            tokenizer_out = self.tokenizer(
+                text=self.get_texts_from_ids([paper_id]),
+                # text_pair=section_titles,
+                add_special_tokens=True,
+                return_attention_mask=True,
+                return_tensors='pt',
+                padding='max_length',
+                max_length=self.max_sequence_length,
+                truncation=True,
+                return_token_type_ids=self.return_token_type_ids,
+                return_special_tokens_mask=self.return_special_tokens_mask,
+            )
+
+            for k, v in tokenizer_out.items():
+                self.paper_id_to_inputs[paper_id][k] = v[0]
+
+            self.paper_id_to_inputs.commit()
+
+            del tokenizer_out
+
         return self.paper_id_to_inputs[paper_id]
 
     def mask_tokens(self, inputs: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
@@ -220,29 +241,6 @@ class TripleDataset(Dataset):
         logger.info(f'Tokenize papers: {len(tokenize_paper_ids):,}')
 
         if len(tokenize_paper_ids) > 0:
-            for j in tqdm.tqdm(range(0, len(tokenize_paper_ids), 100)):
-                tokenize_paper_ids_batch = tokenize_paper_ids[j:j+100]
-
-                tokenizer_out = self.tokenizer(
-                    text=self.get_texts_from_ids(tokenize_paper_ids_batch),
-                    # text_pair=section_titles,
-                    add_special_tokens=True,
-                    return_attention_mask=True,
-                    return_tensors='pt',
-                    padding='max_length',
-                    max_length=self.max_sequence_length,
-                    truncation=True,
-                    return_token_type_ids=self.return_token_type_ids,
-                    return_special_tokens_mask=self.return_special_tokens_mask,
-                )
-
-                # Store in index
-                for idx, paper_id in enumerate(tqdm.tqdm(tokenize_paper_ids_batch)):
-                    self.paper_id_to_inputs[paper_id] = {k: v[idx] for k, v in tokenizer_out.items()}
-                    self.paper_id_to_inputs.commit()
-
-                del tokenizer_out
-
             if self.predict_embeddings:
                 # Graph embeddings
                 logger.info('Loading data for embedding prediction')
@@ -259,16 +257,13 @@ class TripleDataset(Dataset):
 
                 # Store in index
                 for idx, paper_id in enumerate(tqdm.tqdm(tokenize_paper_ids)):
+                    self.paper_id_to_inputs[paper_id] = {}
                     self.paper_id_to_inputs[paper_id]['target_embedding'] = graph_embeddings[idx]
+
+                self.paper_ids_to_inputs[paper_id].commit()
 
                 del graph_embeddings
 
-        # Write to cache if enabled and new papers tokenized
-        if self.use_cache and len(tokenize_paper_ids) > 0:
-            logger.info(f'Saving cache to {self.paper_id_to_inputs_path}')
-            self.paper_id_to_inputs.close()
-
-        gc.collect()
         logger.info(f'Dataset loaded with {self.__len__():,} samples')
 
     def __getitem__(self, idx):
