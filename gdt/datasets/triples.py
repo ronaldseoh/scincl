@@ -6,7 +6,6 @@ from typing import Dict
 import torch
 from smart_open import open
 from torch.utils.data import Dataset
-import sqlitedict
 import tqdm
 
 from gdt.utils import get_graph_embeddings
@@ -112,26 +111,30 @@ class TripleDataset(Dataset):
         :return:
         """
 
-        if 'input_ids' not in self.paper_id_to_inputs[paper_id].keys():
-            tokenizer_out = self.tokenizer(
-                text=self.get_texts_from_ids([paper_id]),
-                # text_pair=section_titles,
-                add_special_tokens=True,
-                return_attention_mask=True,
-                return_tensors='pt',
-                padding='max_length',
-                max_length=self.max_sequence_length,
-                truncation=True,
-                return_token_type_ids=self.return_token_type_ids,
-                return_special_tokens_mask=self.return_special_tokens_mask,
-            )
+        output = {}
 
-            for k, v in tokenizer_out.items():
-                self.paper_id_to_inputs[paper_id][k] = v[0]
+        tokenizer_out = self.tokenizer(
+            text=self.get_texts_from_ids([paper_id]),
+            # text_pair=section_titles,
+            add_special_tokens=True,
+            return_attention_mask=True,
+            return_tensors='pt',
+            padding='max_length',
+            max_length=self.max_sequence_length,
+            truncation=True,
+            return_token_type_ids=self.return_token_type_ids,
+            return_special_tokens_mask=self.return_special_tokens_mask,
+        )
 
-            del tokenizer_out
+        for k, v in tokenizer_out.items():
+            output[k] = v[0]
 
-        return self.paper_id_to_inputs[paper_id]
+        del tokenizer_out
+
+        if self.predict_embeddings:
+            output['target_embedding'] = self.graph_embeddings[paper_id]
+
+        return output
 
     def mask_tokens(self, inputs: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
         """
@@ -185,14 +188,6 @@ class TripleDataset(Dataset):
             for line in f:
                 metadata = json.loads(line)
                 self.paper_id_to_metadata[metadata['paper_id']] = metadata
-
-        # Tokenized papers
-        if self.use_cache:
-            logger.info(f'Loading/creating cache from: {self.paper_id_to_inputs_path}')
-            self.paper_id_to_inputs = sqlitedict.SqliteDict(self.paper_id_to_inputs_path, autocommit=True)
-        else:
-            logger.info('Cache not requested or cache file does not exist')
-            self.paper_id_to_inputs = {}
 
         # Triples
         logger.info(f'Reading from: {self.triples_csv_path}')
@@ -248,19 +243,17 @@ class TripleDataset(Dataset):
                     graph_paper_ids = json.load(f)
 
                 # Load from disk and convert to torch tensor (float 32 is required to sum loss with triplet loss)
+                self.graph_embeddings = {}
+
                 graph_embeddings = torch.tensor(
                     get_graph_embeddings(self.graph_embeddings_path, do_normalize=False, workers=1, paper_ids=graph_paper_ids, include_paper_ids=tokenize_paper_ids),
                     dtype=torch.float32
                 )
 
-            # Store in index
-            for idx, paper_id in enumerate(tqdm.tqdm(tokenize_paper_ids)):
-                self.paper_id_to_inputs[paper_id] = {}
-                
-                if self.predict_embeddings:
-                    self.paper_id_to_inputs[paper_id]['target_embedding'] = graph_embeddings[idx]
+                # Store in index
+                for idx, paper_id in enumerate(tqdm.tqdm(tokenize_paper_ids)):
+                    self.graph_embeddings[paper_id] = graph_embeddings[idx]
 
-            if self.predict_embeddings:
                 del graph_embeddings
 
         logger.info(f'Dataset loaded with {self.__len__():,} samples')
