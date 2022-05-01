@@ -184,7 +184,7 @@ class TripleDataset(Dataset):
         no_metadata = []
 
         with open(self.triples_csv_path) as f:
-            for i, line in enumerate(f):
+            for i, line in enumerate(tqdm.tqdm(f)):
                 if i > 0:  # Skip header row
                     col = line.strip().split(',')
                     anchor_id, pos_id, neg_id = col
