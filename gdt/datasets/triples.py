@@ -125,6 +125,9 @@ class TripleDataset(Dataset):
                 return_token_type_ids=self.return_token_type_ids,
                 return_special_tokens_mask=self.return_special_tokens_mask,
             )
+            
+            if paper_id not in self.paper_id_to_inputs.keys():
+                self.paper_id_to_inputs[paper_id] = {}
 
             for k, v in tokenizer_out.items():
                 self.paper_id_to_inputs[paper_id][k] = v[0]
