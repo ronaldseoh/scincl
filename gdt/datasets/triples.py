@@ -129,8 +129,6 @@ class TripleDataset(Dataset):
             for k, v in tokenizer_out.items():
                 self.paper_id_to_inputs[paper_id][k] = v[0]
 
-            self.paper_id_to_inputs.commit()
-
             del tokenizer_out
 
         return self.paper_id_to_inputs[paper_id]
@@ -191,7 +189,7 @@ class TripleDataset(Dataset):
         # Tokenized papers
         if self.use_cache:
             logger.info(f'Loading/creating cache from: {self.paper_id_to_inputs_path}')
-            self.paper_id_to_inputs = sqlitedict.SqliteDict(self.paper_id_to_inputs_path)
+            self.paper_id_to_inputs = sqlitedict.SqliteDict(self.paper_id_to_inputs_path, autocommit=True)
         else:
             logger.info('Cache not requested or cache file does not exist')
             self.paper_id_to_inputs = {}
@@ -261,7 +259,6 @@ class TripleDataset(Dataset):
                 
                 if self.predict_embeddings:
                     self.paper_id_to_inputs[paper_id]['target_embedding'] = graph_embeddings[idx]
-                    self.paper_id_to_inputs[paper_id].commit()
 
             if self.predict_embeddings:
                 del graph_embeddings
