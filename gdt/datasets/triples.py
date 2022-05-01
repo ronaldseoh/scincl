@@ -220,7 +220,7 @@ class TripleDataset(Dataset):
         logger.info(f'Tokenize papers: {len(tokenize_paper_ids):,}')
 
         if len(tokenize_paper_ids) > 0:
-            for j in tqdm.tqdm(range(0, len(tokenizer_paper_ids), 100)):
+            for j in tqdm.tqdm(range(0, len(tokenize_paper_ids), 100)):
                 tokenize_paper_ids_batch = tokenize_paper_ids[j:j+100]
 
                 tokenizer_out = self.tokenizer(
