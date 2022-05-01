@@ -2,12 +2,12 @@ import json
 import logging
 import os
 from typing import Dict
-import shelve
 import gc
 
 import torch
 from smart_open import open
 from torch.utils.data import Dataset
+import sqlitedict
 import tqdm
 
 from gdt.utils import get_graph_embeddings
@@ -170,7 +170,7 @@ class TripleDataset(Dataset):
         # Tokenized papers
         if self.use_cache:
             logger.info(f'Loading/creating cache from: {self.paper_id_to_inputs_path}')
-            self.paper_id_to_inputs = shelve.open(self.paper_id_to_inputs_path)
+            self.paper_id_to_inputs = sqlitedict.SqliteDict(self.paper_id_to_inputs_path)
         else:
             logger.info('Cache not requested or cache file does not exist')
             self.paper_id_to_inputs = {}
@@ -239,6 +239,7 @@ class TripleDataset(Dataset):
                 # Store in index
                 for idx, paper_id in enumerate(tqdm.tqdm(tokenize_paper_ids_batch)):
                     self.paper_id_to_inputs[paper_id] = {k: v[idx] for k, v in tokenizer_out.items()}
+                    self.paper_id_to_inputs.commit()
 
                 del tokenizer_out
 
