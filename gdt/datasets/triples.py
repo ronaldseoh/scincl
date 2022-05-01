@@ -112,7 +112,7 @@ class TripleDataset(Dataset):
         :return:
         """
 
-        if paper_id not in self.paper_id_to_inputs.keys() or 'input_ids' not in self.paper_id_to_inputs[paper_id].keys():
+        if 'input_ids' not in self.paper_id_to_inputs[paper_id].keys():
             tokenizer_out = self.tokenizer(
                 text=self.get_texts_from_ids([paper_id]),
                 # text_pair=section_titles,
@@ -125,9 +125,6 @@ class TripleDataset(Dataset):
                 return_token_type_ids=self.return_token_type_ids,
                 return_special_tokens_mask=self.return_special_tokens_mask,
             )
-            
-            if paper_id not in self.paper_id_to_inputs.keys():
-                self.paper_id_to_inputs[paper_id] = {}
 
             for k, v in tokenizer_out.items():
                 self.paper_id_to_inputs[paper_id][k] = v[0]
@@ -258,13 +255,15 @@ class TripleDataset(Dataset):
                     dtype=torch.float32
                 )
 
-                # Store in index
-                for idx, paper_id in enumerate(tqdm.tqdm(tokenize_paper_ids)):
-                    self.paper_id_to_inputs[paper_id] = {}
+            # Store in index
+            for idx, paper_id in enumerate(tqdm.tqdm(tokenize_paper_ids)):
+                self.paper_id_to_inputs[paper_id] = {}
+                
+                if self.predict_embeddings:
                     self.paper_id_to_inputs[paper_id]['target_embedding'] = graph_embeddings[idx]
+                    self.paper_id_to_inputs[paper_id].commit()
 
-                self.paper_ids_to_inputs[paper_id].commit()
-
+            if self.predict_embeddings:
                 del graph_embeddings
 
         logger.info(f'Dataset loaded with {self.__len__():,} samples')
