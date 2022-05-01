@@ -220,24 +220,27 @@ class TripleDataset(Dataset):
         logger.info(f'Tokenize papers: {len(tokenize_paper_ids):,}')
 
         if len(tokenize_paper_ids) > 0:
-            tokenizer_out = self.tokenizer(
-                text=self.get_texts_from_ids(tokenize_paper_ids),
-                # text_pair=section_titles,
-                add_special_tokens=True,
-                return_attention_mask=True,
-                return_tensors='pt',
-                padding='max_length',
-                max_length=self.max_sequence_length,
-                truncation=True,
-                return_token_type_ids=self.return_token_type_ids,
-                return_special_tokens_mask=self.return_special_tokens_mask,
-            )
+            for j in tqdm.tqdm(range(0, len(tokenizer_paper_ids), 100)):
+                tokenize_paper_ids_batch = tokenize_paper_ids[j:j+100]
 
-            # Store in index
-            for idx, paper_id in enumerate(tokenize_paper_ids):
-                self.paper_id_to_inputs[paper_id] = {k: v[idx] for k, v in tokenizer_out.items()}
+                tokenizer_out = self.tokenizer(
+                    text=self.get_texts_from_ids(tokenize_paper_ids_batch),
+                    # text_pair=section_titles,
+                    add_special_tokens=True,
+                    return_attention_mask=True,
+                    return_tensors='pt',
+                    padding='max_length',
+                    max_length=self.max_sequence_length,
+                    truncation=True,
+                    return_token_type_ids=self.return_token_type_ids,
+                    return_special_tokens_mask=self.return_special_tokens_mask,
+                )
 
-            del tokenizer_out
+                # Store in index
+                for idx, paper_id in enumerate(tqdm.tqdm(tokenize_paper_ids_batch)):
+                    self.paper_id_to_inputs[paper_id] = {k: v[idx] for k, v in tokenizer_out.items()}
+
+                del tokenizer_out
 
             if self.predict_embeddings:
                 # Graph embeddings
