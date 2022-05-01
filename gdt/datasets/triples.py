@@ -2,6 +2,7 @@ import json
 import logging
 import os
 from typing import Dict
+import shelve
 
 import torch
 from smart_open import open
@@ -165,11 +166,9 @@ class TripleDataset(Dataset):
                 self.paper_id_to_metadata[metadata['paper_id']] = metadata
 
         # Tokenized papers
-        if self.use_cache and os.path.exists(self.paper_id_to_inputs_path):
-            logger.info(f'Loading cache from: {self.paper_id_to_inputs_path}')
-
-            with open(self.paper_id_to_inputs_path, 'rb') as f:
-                self.paper_id_to_inputs = torch.load(f)
+        if self.use_cache:
+            logger.info(f'Loading/creating cache from: {self.paper_id_to_inputs_path}')
+            self.paper_id_to_inputs = shelve.open(self.paper_id_to_inputs_path)
         else:
             logger.info('Cache not requested or cache file does not exist')
             self.paper_id_to_inputs = {}
@@ -261,9 +260,7 @@ class TripleDataset(Dataset):
         # Write to cache if enabled and new papers tokenized
         if self.use_cache and len(tokenize_paper_ids) > 0:
             logger.info(f'Saving cache to {self.paper_id_to_inputs_path}')
-
-            with open(self.paper_id_to_inputs_path, 'wb') as f:
-                torch.save(self.paper_id_to_inputs, f)
+            self.paper_id_to_inputs.close()
 
         logger.info(f'Dataset loaded with {self.__len__():,} samples')
 
