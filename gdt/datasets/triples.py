@@ -3,10 +3,12 @@ import logging
 import os
 from typing import Dict
 import shelve
+import gc
 
 import torch
 from smart_open import open
 from torch.utils.data import Dataset
+import tqdm
 
 from gdt.utils import get_graph_embeddings
 
@@ -252,7 +254,7 @@ class TripleDataset(Dataset):
                 )
 
                 # Store in index
-                for idx, paper_id in enumerate(tokenize_paper_ids):
+                for idx, paper_id in enumerate(tqdm.tqdm(tokenize_paper_ids)):
                     self.paper_id_to_inputs[paper_id]['target_embedding'] = graph_embeddings[idx]
 
                 del graph_embeddings
@@ -262,6 +264,7 @@ class TripleDataset(Dataset):
             logger.info(f'Saving cache to {self.paper_id_to_inputs_path}')
             self.paper_id_to_inputs.close()
 
+        gc.collect()
         logger.info(f'Dataset loaded with {self.__len__():,} samples')
 
     def __getitem__(self, idx):
