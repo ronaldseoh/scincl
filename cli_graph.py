@@ -375,9 +375,9 @@ def build_faiss(
         except:
             for j, v in enumerate(vecs):
                 try:
-                    print(v)
                     index.add(v)
                 except:
+                    print(v)
                     print(str(i+j), "was the culprit.")
                     continue
 
