@@ -370,16 +370,8 @@ def build_faiss(
 
         if do_normalize:
             faiss.normalize_L2(vecs)
-
-        try:
-            index.add(vecs)
-        except:
-            for j, v in enumerate(vecs):
-                try:
-                    index.add(v)
-                except:
-                    print(str(i+j), "was the culprit.")
-                    continue
+ 
+        index.add(vecs)
 
     faiss.write_index(index, index_path)
 
