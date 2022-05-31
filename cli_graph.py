@@ -322,11 +322,7 @@ def build_faiss(
     else:
         graph_embeddings = graph_embeddings_or_path
 
-    graph_embedding_size = len(graph_embeddings[0])
-
-    if do_normalize:
-        logger.info(f'Normalize {graph_embeddings.shape} with faiss')
-        faiss.normalize_L2(graph_embeddings)
+    graph_embedding_size = len(graph_embeddings)
 
     index = faiss.index_factory(graph_embedding_size, string_factory, metric_type)
 
@@ -357,6 +353,10 @@ def build_faiss(
     else:
         train_vecs = graph_embeddings
 
+    if do_normalize:
+        logger.info(f'Normalize {train_vecs.shape} with faiss')
+        faiss.normalize_L2(train_vecs)
+
     logger.info(f'Training ... train_size = {train_size:,}')
 
     index.train(train_vecs)
@@ -370,6 +370,9 @@ def build_faiss(
     for i in tqdm(range(0, len(graph_embeddings), batch_size), desc=f'Adding (batch_size={batch_size:,})'):
         vecs = graph_embeddings[i: i + batch_size]
 
+        if do_normalize:
+            faiss.normalize_L2(vecs)
+
         try:
             index.add(vecs)
         except:
@@ -377,12 +380,8 @@ def build_faiss(
                 try:
                     index.add(v)
                 except:
-                    print(v)
                     print(str(i+j), "was the culprit.")
                     continue
-
-        # See https://github.com/facebookresearch/faiss/issues/1517
-        # index.reclaimMemory()
 
     faiss.write_index(index, index_path)
 
