@@ -322,7 +322,7 @@ def build_faiss(
     else:
         graph_embeddings = graph_embeddings_or_path
 
-    graph_embedding_size = len(graph_embeddings)
+    graph_embedding_size = graph_embeddings.shape[1]
 
     index = faiss.index_factory(graph_embedding_size, string_factory, metric_type)
 
