@@ -350,16 +350,14 @@ def build_faiss(
 
     if train_size > 0:
         train_vecs = graph_embeddings[:train_size]
-    else:
-        train_vecs = graph_embeddings
 
-    if do_normalize:
-        logger.info(f'Normalize {train_vecs.shape} with faiss')
-        faiss.normalize_L2(train_vecs)
+        if do_normalize:
+            logger.info(f'Normalize {train_vecs.shape} with faiss')
+            faiss.normalize_L2(train_vecs)
 
-    logger.info(f'Training ... train_size = {train_size:,}')
+        logger.info(f'Training ... train_size = {train_size:,}')
 
-    index.train(train_vecs)
+        index.train(train_vecs)
 
     # write to disk
     if (isinstance(device, int) and device > -1) or device == 'all':
