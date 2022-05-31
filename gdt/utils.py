@@ -292,13 +292,14 @@ def get_graph_embeddings(graph_embeddings_path: str, do_normalize: bool = False,
     logger.info(f'Loading embeddings from: {graph_embeddings_path}')
 
     # reading all embeddings at once is quicker than loading with indices ---> but i dont have gazillion RAM...
-    with h5py.File(graph_embeddings_path, "r") as hf:
-        if placeholder:
-            graph_embeddings = hf["embeddings"][:1, :]  # placeholder (only the first entry)
+    hf = h5py.File(graph_embeddings_path, "r")
 
-            logger.warning('Returning only first entry as placeholder for embeddings')
-        else:
-            graph_embeddings = hf["embeddings"]
+    if placeholder:
+        graph_embeddings = hf["embeddings"][:1, :]  # placeholder (only the first entry)
+
+        logger.warning('Returning only first entry as placeholder for embeddings')
+    else:
+        graph_embeddings = hf["embeddings"]
 
     # Filter embeddings based on paper IDs
     if isinstance(paper_ids, str) and isinstance(include_paper_ids, str):
