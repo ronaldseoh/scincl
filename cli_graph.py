@@ -387,8 +387,11 @@ def build_faiss(
         'batch_size': batch_size,
         'train_size': train_size,
         'workers': workers,
-        'train_vecs_shape': list(train_vecs.shape),
     }
+
+    if train_size > 0:
+        config['train_vecs_shape'] = list(train_vecs.shape)
+
     with open(config_path, 'w') as f:
         json.dump(config, f)
 
