@@ -1,16 +1,15 @@
 import json
 import csv
-import gzip
 
 import tqdm
 
 
 if __name__ == '__main__':
 
-    scincl_data_file_path = "train_triples.csv.gz"
+    scincl_data_file_path = "train_triples.csv"
     train_query_s2orc_paper_ids = set()
 
-    with gzip.open(scincl_data_file_path, 'r') as f_in:
+    with open(scincl_data_file_path, 'r') as f_in:
         reader = csv.reader(f_in, delimiter=',')
 
         for row in tqdm.tqdm(reader):
