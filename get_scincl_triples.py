@@ -1,6 +1,9 @@
 import argparse
 import json
 import os
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 import numpy as np
 
