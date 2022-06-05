@@ -109,7 +109,7 @@ def get_generic_triples(
         import faiss
 
         global index
-        logger.info(f'Loading FAISS index (path={self.args.ann_index_path}; worker_id={self.worker_id};)')
+        logger.info(f'Loading FAISS index (path={triples_miner_args.ann_index_path};)')
         index = faiss.read_index(triples_miner_args.ann_index_path)
 
     # Easy negatives = random papers
