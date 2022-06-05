@@ -104,6 +104,14 @@ def get_generic_triples(
         else:
             raise NotImplementedError(f'Cannot build ANN index with backend = {triples_miner_args.ann_backend} '
                                       f'(use extra CLI script instead)')
+                                      
+    if triples_miner_args.ann_backend == AnnBackend.FAISS:
+        import faiss
+
+        global index
+        logger.info(f'Loading FAISS index (path={self.args.ann_index_path}; worker_id={self.worker_id};)')
+        index = faiss.read_index(triples_miner_args.ann_index_path)
+
     # Easy negatives = random papers
     # easy_negatives = []
     #

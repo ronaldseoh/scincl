@@ -424,10 +424,7 @@ class FaissSampler(BaseSampler):
 
         import faiss
 
-        logger.info(f'Loading FAISS index (path={self.args.ann_index_path}; worker_id={self.worker_id};)')
-
-        # Load FAISS from disk
-        index = faiss.read_index(args.ann_index_path)
+        global index
 
         # From https://github.com/facebookresearch/faiss/wiki/Faster-search
         # nlist, the number of cells, and
