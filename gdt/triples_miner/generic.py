@@ -1,6 +1,6 @@
 import logging
 import os
-from multiprocessing import Pool
+from multiprocessing.dummy import Pool
 from typing import Dict, List, Union
 
 import numpy as np
