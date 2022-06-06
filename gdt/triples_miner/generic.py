@@ -108,7 +108,7 @@ def get_generic_triples(
     if triples_miner_args.ann_backend == AnnBackend.FAISS:
         from gdt.triples_miner import faiss_loader
         logger.info(f'Loading FAISS index (path={triples_miner_args.ann_index_path};)')
-        faiss_loader.load_faiss_index(triples_miner_args.ann_index_path)
+        faiss_loader.index = faiss.read_index(triples_miner_args.ann_index_path)
 
     # Easy negatives = random papers
     # easy_negatives = []
