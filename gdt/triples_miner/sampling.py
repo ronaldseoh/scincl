@@ -422,9 +422,9 @@ class FaissSampler(BaseSampler):
         #     raise ValueError(f'k_max is too large for FAISS')
         # ===> Ignore, because we do not use CUDA for search (only for building the index)
 
-        import faiss
-
-        global index
+        from gdt.triples_miner import faiss_loader
+        
+        index = faiss_loader.index
 
         # From https://github.com/facebookresearch/faiss/wiki/Faster-search
         # nlist, the number of cells, and
