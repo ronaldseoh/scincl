@@ -57,7 +57,7 @@ if __name__ == '__main__':
         if not isinstance(train_s2orc_paper_ids, list):
             train_s2orc_paper_ids = list(train_s2orc_paper_ids)  # python sets are unordered -> convert to list!
 
-        print('Limiting graph embedding to SPECTER')
+        print('Limiting graph embedding to the selected paper ids')
 
         if triples_miner_args.ann_index_path is None or not os.path.exists(triples_miner_args.ann_index_path):
             train_embeddings = np.array(
