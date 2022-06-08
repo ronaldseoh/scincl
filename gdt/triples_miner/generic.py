@@ -97,7 +97,7 @@ def get_generic_triples(
                 # See `get_specter_triples`
                 paper_ids=None,
                 include_paper_ids=None,
-                device='all',
+                device=-1,
                 batch_size=triples_miner_args.ann_batch_size,
                 train_size=triples_miner_args.ann_train_size,
             )
