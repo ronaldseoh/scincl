@@ -92,7 +92,7 @@ class TripleDataset(Dataset):
         if self.abstract_only:
             # Wikipedia: Only "first sentence" = abstract (if null -> title)
             for pid in paper_ids:
-                if pid not in self.paper_id_to_metadata.keys()
+                if pid not in self.paper_id_to_metadata.keys():
                     output.append('')
                 else:
                     if 'abstract' in self.paper_id_to_metadata[pid].keys():
@@ -105,7 +105,7 @@ class TripleDataset(Dataset):
             # SPECTER the title and abstract of a paper, separated by the [SEP] token.
             # See https://github.com/allenai/specter#1--through-huggingface-transformers-library
             for pid in paper_ids:
-                if pid not in self.paper_id_to_metadata.keys()
+                if pid not in self.paper_id_to_metadata.keys():
                     output.append(self.tokenizer.sep_token)
                 else:
                     title = ''
