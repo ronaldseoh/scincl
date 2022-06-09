@@ -87,21 +87,39 @@ class TripleDataset(Dataset):
         self.paper_id_to_inputs_path += '.cache'
 
     def get_texts_from_ids(self, paper_ids):
+        output = []
+
         if self.abstract_only:
             # Wikipedia: Only "first sentence" = abstract (if null -> title)
-            return [
-                (self.paper_id_to_metadata[pid]['abstract'] or self.paper_id_to_metadata[pid]['title'])
-                for pid in paper_ids
-            ]
+            for pid in paper_ids:
+                if pid not in self.paper_id_to_metadata.keys()
+                    output.append('')
+                else:
+                    if 'abstract' in self.paper_id_to_metadata[pid].keys():
+                        output.append(self.paper_id_to_metadata[pid]['abstract'])
+                    elif 'title' in self.paper_id_to_metadata[pid].keys():
+                        output.append(self.paper_id_to_metadata[pid]['title'])
+                    else:
+                        output.append('')
         else:
             # SPECTER the title and abstract of a paper, separated by the [SEP] token.
             # See https://github.com/allenai/specter#1--through-huggingface-transformers-library
-            return [
-                self.paper_id_to_metadata[pid]['title']
-                + self.tokenizer.sep_token
-                + (self.paper_id_to_metadata[pid]['abstract'] or '')
-                for pid in paper_ids
-            ]
+            for pid in paper_ids:
+                if pid not in self.paper_id_to_metadata.keys()
+                    output.append(self.tokenizer.sep_token)
+                else:
+                    title = ''
+                    abstract = ''
+
+                    if 'title' in self.paper_id_to_metadata[pid].keys():
+                        output.append(self.paper_id_to_metadata[pid]['title']
+
+                    if 'abstract' in self.paper_id_to_metadata[pid].keys():
+                        title = self.paper_id_to_metadata[pid]['abstract']
+
+                    output.append(title + self.tokenizer.sep_token + abstract)
+
+        return output
 
     def get_inputs_from_id(self, paper_id):
         """
