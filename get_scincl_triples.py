@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import logging
+import pathlib
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -9,6 +10,7 @@ import numpy as np
 
 from gdt.triples_miner import TriplesMinerArguments
 from gdt.triples_miner.generic import get_generic_triples
+from cli_triples import get_metadata
 from gdt.utils import get_graph_embeddings, get_workers
 
 if __name__ == '__main__':
@@ -23,10 +25,14 @@ if __name__ == '__main__':
 
     parser.add_argument('--triples_miner_kwargs', type=json.loads)
 
+    parser.add_argument('--s2orc_metadata_dir')
+
     parser.add_argument('--output_path')
     parser.add_argument('--workers', default=24, type=int)
 
     args = parser.parse_args()
+
+    pathlib.Path(args.output_path).mkdir(parents=True, exist_ok=True)
 
     triples_miner_args = TriplesMinerArguments(**args.triples_miner_kwargs)
     workers = get_workers(args.workers)
@@ -81,7 +87,15 @@ if __name__ == '__main__':
                         train_idx_to_s2orc_paper_id,
                         train_query_s2orc_paper_ids,
                         train_embeddings,
-                        args.output_path,
+                        os.path.join(args.output_path, 'train_triples.csv'),
                         triples_miner_args=triples_miner_args,
                         workers=workers,
                         output_csv_header='query_paper_id,positive_id,negative_id')
+
+    logger.info('Generating triple metadata')
+
+    # Extract metadata for triples
+    get_metadata(input_path=os.path.join(args.output_path, 'train_triples.csv'),
+                 output_path=os.path.join(args.output_path, 'train_metadata.jsonl'),
+                 s2orc_metadata_dir=args.s2orc_metadata_dir,
+                 workers=workers)
