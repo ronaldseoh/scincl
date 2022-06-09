@@ -1,5 +1,13 @@
 # SciNCL
 
+## With leakage
+
+```bash
+python get_scincl_triples.py --graph_limit specter --graph_paper_ids_path /iesl/canvas/bseoh/s2orc_with_specter_without_scidocs/entity_names_paper_id_0.json --graph_embeddings_path /iesl/canvas/bseoh/s2orc_with_specter_without_scidocs/embeddings_paper_id_0.v200.h5  --train_s2orc_paper_ids_path /iesl/canvas/bseoh/with_leakage/specter_s2orc_paper_ids.json --train_query_s2orc_paper_ids_path /iesl/canvas/bseoh/with_leakage/train_query_s2orc_paper_ids.json --triples_miner_kwargs '{"ann_index_path": "/iesl/canvas/bseoh/s2orc_with_specter_without_scidocs/faiss"}' --output_path /iesl/canvas/bseoh/with_leakage/new2 --workers 24
+```
+
+## Without leakage
+
 ```bash
 python get_scincl_triples.py --graph_paper_ids_path /iesl/canvas/bseoh/s2orc_without_scidocs/entity_names_paper_id_0.json --graph_embeddings_path 
 /iesl/canvas/bseoh/s2orc_without_scidocs/embeddings_paper_id_0.v200.h5  --train_s2orc_paper_ids_path /iesl/canvas/bseoh/without_leakage/s2orc_paper_ids.seed_0.json --train_query_s2orc_paper_ids_path 
