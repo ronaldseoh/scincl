@@ -92,7 +92,7 @@ if __name__ == '__main__':
                         workers=workers,
                         output_csv_header='query_paper_id,positive_id,negative_id')
 
-    logger.info('Generating triple metadata')
+    print('Generating triple metadata')
 
     # Extract metadata for triples
     get_metadata(input_path=os.path.join(args.output_path, 'train_triples.csv'),
