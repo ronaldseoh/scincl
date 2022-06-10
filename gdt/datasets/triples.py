@@ -111,10 +111,12 @@ class TripleDataset(Dataset):
                     title = ''
                     abstract = ''
 
-                    if 'title' in self.paper_id_to_metadata[pid].keys():
+                    if 'title' in self.paper_id_to_metadata[pid].keys() \
+                    and self.paper_id_to_metadata[pid]['title'] is not None:
                         title = self.paper_id_to_metadata[pid]['title']
 
-                    if 'abstract' in self.paper_id_to_metadata[pid].keys():
+                    if 'abstract' in self.paper_id_to_metadata[pid].keys() \
+                    and self.paper_id_to_metadata[pid]['abstract'] is not None:
                         abstract = self.paper_id_to_metadata[pid]['abstract']
 
                     output.append(title + self.tokenizer.sep_token + abstract)
